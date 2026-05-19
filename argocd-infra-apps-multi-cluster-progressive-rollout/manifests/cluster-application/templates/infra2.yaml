@@ -7,9 +7,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://ealenn.github.io/charts
-    chart: echo-server
-    targetRevision: 0.5.0
+    repoURL: https://github.com/krzwiatrzyk/showroom.git
+    targetRevision: HEAD
+    path: argocd-infra-apps-multi-cluster-progressive-rollout/app
     helm:
       releaseName: infra2
   destination:

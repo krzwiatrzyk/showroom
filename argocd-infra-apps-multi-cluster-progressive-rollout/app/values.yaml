@@ -1,0 +1,10 @@
+image:
+  repository: ealen/echo-server
+  tag: "0.5.0"
+  pullPolicy: IfNotPresent
+
+startupDelaySeconds: 10
+
+service:
+  type: ClusterIP
+  port: 80
