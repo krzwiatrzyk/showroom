@@ -36,7 +36,7 @@ spec:
           releaseName: {{ `"{{ .name }}"` }}
       destination:
         name: {{ .Values.cluster | quote }}
-        namespace: {{ `"{{ .name }}"` }}
+        namespace: {{ .Values.cluster | quote }}
       syncPolicy:
         automated:
           prune: true

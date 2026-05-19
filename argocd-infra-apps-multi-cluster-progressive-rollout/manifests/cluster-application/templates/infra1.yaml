@@ -14,7 +14,7 @@ spec:
       releaseName: infra1
   destination:
     name: "{{ .Values.cluster }}"
-    namespace: infra1
+    namespace: "{{ .Values.cluster }}-infra1"
   syncPolicy:
     automated:
       prune: true
