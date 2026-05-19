@@ -33,12 +33,12 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/krzwiatrzyk/showcase.git
+        repoURL: https://github.com/krzwiatrzyk/showroom.git
         targetRevision: HEAD
         path: argocd-infra-apps-multi-cluster-progressive-rollout/manifests/cluster-application
         helm:
           releaseName: "cluster-{{ .name }}"
-          values:
+          valuesObject:
             cluster: "{{ .name }}"
       destination:
         name: in-cluster

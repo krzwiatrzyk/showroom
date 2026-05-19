@@ -10,6 +10,10 @@ tasks:
     cmds:
       - kubectl apply -f manifests/clusters
 
+  apply:cluster-application-set:
+    cmds:
+      - kubectl apply -f manifests/cluster-application-set.yaml
+
   port-forward:
     cmds:
       - kubectl port-forward svc/argocd-server -n argocd 8080:443
