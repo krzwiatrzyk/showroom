@@ -7,6 +7,14 @@ metadata:
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
+  strategy:
+    type: RollingSync
+    rollingSync:
+      steps:
+        - matchExpressions:
+            - key: app-of-apps
+              operator: In
+              values: ["true"]
   generators:
     - git:
         repoURL: https://github.com/krzwiatrzyk/showroom.git
@@ -16,6 +24,8 @@ spec:
   template:
     metadata:
       name: {{ `"{{ .name }}"` }}
+      labels:
+        app-of-apps: "true"
     spec:
       project: default
       source:

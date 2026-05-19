@@ -10,9 +10,11 @@ tasks:
     cmds:
       - kubectl apply -f manifests/clusters
 
-  apply:cluster-application-set:
+
+  apply:app-of-apps:
     cmds:
-      - kubectl apply -f manifests/cluster-application-set.yaml
+      - kubectl apply -f manifests/app-of-apps.yaml
+    desc: "Apply ArgoCD Application of Applications manifest"
 
   port-forward:
     cmds:
