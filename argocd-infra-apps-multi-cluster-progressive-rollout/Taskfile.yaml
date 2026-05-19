@@ -1,0 +1,28 @@
+version: 3
+
+tasks:
+  sync:
+    cmds:
+      - helmfile sync
+    desc: "Sync ArgoCD with Helmfile"
+
+  apply:clusters:
+    cmds:
+      - kubectl apply -f manifests/clusters
+
+  port-forward:
+    cmds:
+      - kubectl port-forward svc/argocd-server -n argocd 8080:443
+    desc: "Port forward ArgoCD server to localhost:8080"
+
+  ui:
+    cmds:
+      - open http://localhost:8080
+    desc: "Open ArgoCD UI in the browser"
+
+  commit:
+    cmds:
+      - git add .
+      - git commit -m "Update ArgoCD configuration"
+      - git push origin main
+    desc: "Commit changes to Git"

@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: infra1
+spec:
+  project: default
+  source:
+    repoURL: https://ealenn.github.io/charts
+    chart: echo-server
+    targetRevision: 0.5.0
+    helm:
+      releaseName: infra1
+  destination:
+    name: "{{ .Values.cluster }}"
+    namespace: infra1
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

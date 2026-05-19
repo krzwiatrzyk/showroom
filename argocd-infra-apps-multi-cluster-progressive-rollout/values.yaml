@@ -1,0 +1,25 @@
+global:
+  domain: argocd.local
+
+configs:
+  params:
+    server.insecure: true
+    applicationsetcontroller.enable.progressive.syncs: "true"
+    application.namespaces: "*"
+  secret:
+    # admin:password
+    argocdServerAdminPassword: "$2y$10$y43Syq7ADqB9pSIJfGMgLOA8iBQ51CxO/H8lWLJVysFMKw4Mdn5Ja"
+    argocdServerAdminPasswordMtime: "2026-05-19T00:00:00Z"
+
+server:
+  service:
+    type: ClusterIP
+
+dex:
+  enabled: false
+
+notifications:
+  enabled: false
+
+applicationSet:
+  enabled: true
