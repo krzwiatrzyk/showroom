@@ -13,6 +13,41 @@ configs:
     argocdServerAdminPassword: "$2y$10$y43Syq7ADqB9pSIJfGMgLOA8iBQ51CxO/H8lWLJVysFMKw4Mdn5Ja"
     argocdServerAdminPasswordMtime: "2026-05-19T00:00:00Z"
   cm:
+    resource.customizations.health.argoproj.io_Application: |
+      hs = {
+        status = "Progressing",
+        message = "Waiting for Application status",
+      }
+
+      if obj.status == nil then
+        return hs
+      end
+
+      if obj.status.operationState ~= nil then
+        local phase = obj.status.operationState.phase
+        if phase == "Running" or phase == "Terminating" then
+          hs.message = "Sync operation " .. phase
+          return hs
+        end
+        if phase == "Failed" or phase == "Error" then
+          hs.status = "Degraded"
+          hs.message = obj.status.operationState.message or ("Sync " .. phase)
+          return hs
+        end
+      end
+
+      if obj.status.sync == nil or obj.status.sync.status ~= "Synced" then
+        hs.message = "Sync status: " .. ((obj.status.sync or {}).status or "Unknown")
+        return hs
+      end
+
+      if obj.status.health ~= nil then
+        hs.status = obj.status.health.status
+        hs.message = obj.status.health.message or ("Health: " .. obj.status.health.status)
+        return hs
+      end
+
+      return hs
     resource.customizations.health.argoproj.io_ApplicationSet: |
       hs = {
         status = "Progressing",

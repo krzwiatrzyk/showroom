@@ -24,6 +24,8 @@ spec:
   template:
     metadata:
       name: {{ `"{{ .name }}"` }}
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
       labels:
         app-of-apps: "true"
     spec:

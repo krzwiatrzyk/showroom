@@ -28,6 +28,8 @@ spec:
   template:
     metadata:
       name: "cluster-{{ .name }}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
       labels:
         clusterType: '{{ index .metadata.labels "type" }}'
     spec:
