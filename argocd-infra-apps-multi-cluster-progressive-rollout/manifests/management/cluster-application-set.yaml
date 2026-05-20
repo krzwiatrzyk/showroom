@@ -37,7 +37,7 @@ spec:
       source:
         repoURL: https://github.com/krzwiatrzyk/showroom.git
         targetRevision: HEAD
-        path: argocd-infra-apps-multi-cluster-progressive-rollout/manifests/cluster-application
+        path: argocd-infra-apps-multi-cluster-progressive-rollout/charts/cluster-application
         helm:
           releaseName: "cluster-{{ .name }}"
           valuesObject:

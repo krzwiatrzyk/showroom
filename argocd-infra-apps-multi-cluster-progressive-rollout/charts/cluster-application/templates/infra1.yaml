@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/krzwiatrzyk/showroom.git
     targetRevision: HEAD
-    path: argocd-infra-apps-multi-cluster-progressive-rollout/app
+    path: argocd-infra-apps-multi-cluster-progressive-rollout/charts/app
     helm:
       releaseName: infra1
   destination:
