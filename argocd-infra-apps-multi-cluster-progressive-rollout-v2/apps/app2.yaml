@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: app2
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  strategy:
+    type: RollingSync
+    rollingSync:
+      steps:
+        - matchExpressions:
+            - key: clusterType
+              operator: In
+              values: ["beta"]
+        - matchExpressions:
+            - key: clusterType
+              operator: In
+              values: ["web"]
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            argocd.argoproj.io/secret-type: cluster
+            windkube.com/infra-ready: "true"
+  template:
+    metadata:
+      name: "{{ .name }}-app2"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      labels:
+        clusterType: '{{ index .metadata.labels "type" }}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/krzwiatrzyk/showroom.git
+        targetRevision: HEAD
+        path: argocd-infra-apps-multi-cluster-progressive-rollout-v2/charts/app
+        helm:
+          releaseName: "{{ .name }}-app2"
+      destination:
+        name: "{{ .name }}"
+        namespace: "{{ .name }}-app2"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
