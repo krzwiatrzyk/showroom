@@ -26,7 +26,7 @@ spec:
             - name: GITHUB_REPOSITORY
               value: "krzwiatrzyk/showroom"
             - name: CLUSTER_FILE_PATH
-              value: "manifests/management/clusters/{{ .Values.clusterName }}.yaml"
+              value: "argocd-infra-apps-multi-cluster-progressive-rollout-v2/manifests/management/clusters/{{ .Values.clusterName }}.yaml"
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:

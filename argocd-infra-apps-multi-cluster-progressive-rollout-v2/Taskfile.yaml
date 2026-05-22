@@ -2,16 +2,17 @@ version: 3
 
 tasks:
   infra-ready:setup:
-    silent: true
-    vars:
-      GITHUB_TOKEN: gopass show infra-ready/GITHUB_TOKEN
+    # silent: true
+    env:
+      GITHUB_TOKEN:
+        sh: gopass show infra-ready/GITHUB_TOKEN
     cmds:
       - kubectl create ns beta1-infra-ready || true
-      - kubectl create secret generic github-token -n beta1-infra-ready --from-literal=token=${GITHUB_TOKEN} || true
+      - kubectl create secret generic infra-ready-github-token -n beta1-infra-ready --from-literal=token="${GITHUB_TOKEN}" || true
       - kubectl create ns web1-infra-ready || true
-      - kubectl create secret generic github-token -n web1-infra-ready --from-literal=token=${GITHUB_TOKEN} || true
+      - kubectl create secret generic infra-ready-github-token -n web1-infra-ready --from-literal=token="${GITHUB_TOKEN}" || true
       - kubectl create ns web2-infra-ready || true
-      - kubectl create secret generic github-token -n web2-infra-ready --from-literal=token=${GITHUB_TOKEN} || true
+      - kubectl create secret generic infra-ready-github-token -n web2-infra-ready --from-literal=token="${GITHUB_TOKEN}" || true
 
   sync:
     cmds:
@@ -48,3 +49,19 @@ tasks:
       - git commit -m "Update ArgoCD configuration"
       - git push origin main
     desc: "Commit changes to Git"
+
+
+  delete-all-finalizers:
+    desc: "Strip finalizers from all Argo CD Applications and ApplicationSets in every namespace"
+    cmds:
+      - |
+        for kind in application applicationset; do
+          kubectl get "$kind.argoproj.io" -A --no-headers \
+            -o custom-columns=":metadata.namespace,:metadata.name" 2>/dev/null \
+          | while read -r ns name; do
+              [ -z "$name" ] && continue
+              echo "patching $kind $ns/$name"
+              kubectl -n "$ns" patch "$kind.argoproj.io" "$name" \
+                --type=merge -p '{"metadata":{"finalizers":null}}'
+            done
+        done
