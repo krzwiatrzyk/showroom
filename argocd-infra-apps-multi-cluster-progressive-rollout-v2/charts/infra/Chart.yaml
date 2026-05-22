@@ -1,0 +1,4 @@
+apiVersion: v2
+name: infra
+version: 0.1.0
+description: Per-cluster infrastructure ArgoCD Applications (infra1, infra2, infra-ready)

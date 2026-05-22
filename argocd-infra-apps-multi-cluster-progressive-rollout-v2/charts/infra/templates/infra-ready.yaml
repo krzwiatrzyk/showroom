@@ -1,0 +1,31 @@
+{{- include "infra.validate" . }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.clusterName }}-infra-ready
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.repoURL | quote }}
+    targetRevision: {{ .Values.targetRevision | quote }}
+    path: {{ .Values.infraReadyChartPath | quote }}
+    helm:
+      releaseName: {{ printf "%s-infra-ready" .Values.clusterName | quote }}
+      valuesObject:
+        clusterName: {{ .Values.clusterName | quote }}
+        githubTokenSecret:
+          name: {{ .Values.githubTokenSecret.name | quote }}
+          key: {{ .Values.githubTokenSecret.key | quote }}
+  destination:
+    name: {{ .Values.clusterName | quote }}
+    namespace: {{ printf "%s-infra-ready" .Values.clusterName | quote }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

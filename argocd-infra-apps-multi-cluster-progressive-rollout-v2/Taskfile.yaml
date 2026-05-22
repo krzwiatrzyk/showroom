@@ -6,8 +6,12 @@ tasks:
     vars:
       GITHUB_TOKEN: gopass show infra-ready/GITHUB_TOKEN
     cmds:
-      - kubectl create ns infra-ready
-      - kubectl create secret generic github-token -n infra-ready --from-literal=token=${GITHUB_TOKEN}
+      - kubectl create ns beta1-infra-ready || true
+      - kubectl create secret generic github-token -n beta1-infra-ready --from-literal=token=${GITHUB_TOKEN} || true
+      - kubectl create ns web1-infra-ready || true
+      - kubectl create secret generic github-token -n web1-infra-ready --from-literal=token=${GITHUB_TOKEN} || true
+      - kubectl create ns web2-infra-ready || true
+      - kubectl create secret generic github-token -n web2-infra-ready --from-literal=token=${GITHUB_TOKEN} || true
 
   sync:
     cmds:

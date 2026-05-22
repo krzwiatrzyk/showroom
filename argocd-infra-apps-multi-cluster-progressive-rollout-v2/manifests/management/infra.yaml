@@ -1,25 +1,38 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
   name: infra
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
-  source:
-    repoURL: https://github.com/krzwiatrzyk/showroom.git
-    targetRevision: HEAD
-    path: argocd-infra-apps-multi-cluster-progressive-rollout-v2/infra
-    directory:
-      recurse: true
-  destination:
-    name: in-cluster
-    namespace: argocd
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            argocd.argoproj.io/secret-type: cluster
+  template:
+    metadata:
+      name: "{{ .name }}-infra"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/krzwiatrzyk/showroom.git
+        targetRevision: HEAD
+        path: argocd-infra-apps-multi-cluster-progressive-rollout-v2/charts/infra
+        helm:
+          releaseName: "{{ .name }}-infra"
+          valuesObject:
+            clusterName: "{{ .name }}"
+      destination:
+        name: in-cluster
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

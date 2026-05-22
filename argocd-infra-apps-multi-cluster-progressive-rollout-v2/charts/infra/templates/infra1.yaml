@@ -1,0 +1,26 @@
+{{- include "infra.validate" . }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.clusterName }}-infra1
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: {{ .Values.repoURL | quote }}
+    targetRevision: {{ .Values.targetRevision | quote }}
+    path: {{ .Values.appChartPath | quote }}
+    helm:
+      releaseName: {{ printf "%s-infra1" .Values.clusterName | quote }}
+  destination:
+    name: {{ .Values.clusterName | quote }}
+    namespace: {{ printf "%s-infra1" .Values.clusterName | quote }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

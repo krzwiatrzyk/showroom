@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/krzwiatrzyk/showroom.git
     targetRevision: HEAD
-    path: argocd-infra-apps-multi-cluster-progressive-rollout/manifests/management
+    path: argocd-infra-apps-multi-cluster-progressive-rollout-v2/manifests/management
     directory:
       recurse: true
   destination:

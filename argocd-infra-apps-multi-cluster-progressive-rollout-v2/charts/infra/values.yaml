@@ -1,0 +1,12 @@
+# Target cluster (must match the ArgoCD cluster secret `name`).
+clusterName: ""
+
+# Secret reference passed to the infra-ready Job for opening the PR.
+githubTokenSecret:
+  name: infra-ready-github-token
+  key: token
+
+repoURL: https://github.com/krzwiatrzyk/showroom.git
+targetRevision: HEAD
+appChartPath: argocd-infra-apps-multi-cluster-progressive-rollout-v2/charts/app
+infraReadyChartPath: argocd-infra-apps-multi-cluster-progressive-rollout-v2/charts/infra-ready
