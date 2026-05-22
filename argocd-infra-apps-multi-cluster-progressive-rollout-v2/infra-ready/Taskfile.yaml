@@ -1,0 +1,21 @@
+version: 3
+
+vars:
+  IMAGE: ttl.sh/windkube-infra-ready:1h
+
+tasks:
+  build:
+    desc: "Build the infra-ready container image"
+    cmds:
+      - docker build -t {{.IMAGE}} .
+
+  push:
+    desc: "Push the infra-ready image to ttl.sh"
+    cmds:
+      - docker push {{.IMAGE}}
+
+  release:
+    desc: "Build and push the infra-ready image"
+    cmds:
+      - task: build
+      - task: push

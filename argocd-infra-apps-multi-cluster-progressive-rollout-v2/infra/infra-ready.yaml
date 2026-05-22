@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: infra-ready
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - clusters: {}
+  template:
+    metadata:
+      name: "{{ .name }}-infra-ready"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      annotations:
+        argocd.argoproj.io/sync-wave: "2"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/krzwiatrzyk/showroom.git
+        targetRevision: HEAD
+        path: argocd-infra-apps-multi-cluster-progressive-rollout-v2/charts/infra-ready
+        helm:
+          releaseName: "{{ .name }}-infra-ready"
+          valuesObject:
+            clusterName: "{{ .name }}"
+            githubTokenSecret:
+              name: infra-ready-github-token
+              key: token
+      destination:
+        name: "{{ .name }}"
+        namespace: infra-ready
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

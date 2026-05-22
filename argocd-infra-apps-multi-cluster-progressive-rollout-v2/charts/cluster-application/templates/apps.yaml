@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: apps
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  strategy:
+    type: RollingSync
+    rollingSync:
+      steps:
+        - matchExpressions:
+            - key: app-of-apps
+              operator: In
+              values: ["true"]
+  generators:
+    - git:
+        repoURL: https://github.com/krzwiatrzyk/showroom.git
+        revision: HEAD
+        files:
+          - path: "argocd-infra-apps-multi-cluster-progressive-rollout/apps/*.yaml"
+  template:
+    metadata:
+      name: {{ `"{{ .name }}"` }}
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      labels:
+        app-of-apps: "true"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/krzwiatrzyk/showroom.git
+        targetRevision: HEAD
+        path: argocd-infra-apps-multi-cluster-progressive-rollout/charts/app
+        helm:
+          releaseName: {{ `"{{ .name }}"` }}
+      destination:
+        name: {{ .Values.cluster | quote }}
+        namespace: {{ .Values.cluster | quote }}
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

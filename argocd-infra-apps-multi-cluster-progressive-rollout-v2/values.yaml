@@ -1,0 +1,102 @@
+global:
+  domain: argocd.local
+
+configs:
+  params:
+    server.insecure: true
+    applicationsetcontroller.enable.progressive.syncs: "true"
+    application.namespaces: "*"
+    applicationsetcontroller.namespaces: "*"
+    applicationsetcontroller.enable.scm.providers: "false"
+  secret:
+    # admin:password
+    argocdServerAdminPassword: "$2y$10$y43Syq7ADqB9pSIJfGMgLOA8iBQ51CxO/H8lWLJVysFMKw4Mdn5Ja"
+    argocdServerAdminPasswordMtime: "2026-05-19T00:00:00Z"
+  cm:
+    resource.customizations.health.argoproj.io_Application: |
+      hs = {
+        status = "Progressing",
+        message = "Waiting for Application status",
+      }
+
+      if obj.status == nil then
+        return hs
+      end
+
+      if obj.status.operationState ~= nil then
+        local phase = obj.status.operationState.phase
+        if phase == "Running" or phase == "Terminating" then
+          hs.message = "Sync operation " .. phase
+          return hs
+        end
+        if phase == "Failed" or phase == "Error" then
+          hs.status = "Degraded"
+          hs.message = obj.status.operationState.message or ("Sync " .. phase)
+          return hs
+        end
+      end
+
+      if obj.status.sync == nil or obj.status.sync.status ~= "Synced" then
+        hs.message = "Sync status: " .. ((obj.status.sync or {}).status or "Unknown")
+        return hs
+      end
+
+      if obj.status.health ~= nil then
+        hs.status = obj.status.health.status
+        hs.message = obj.status.health.message or ("Health: " .. obj.status.health.status)
+        return hs
+      end
+
+      return hs
+    resource.customizations.health.argoproj.io_ApplicationSet: |
+      hs = {
+        status = "Progressing",
+        message = "Waiting for ApplicationSet to reconcile",
+      }
+
+      if obj.status == nil then
+        return hs
+      end
+
+      if obj.status.conditions ~= nil then
+        for _, c in ipairs(obj.status.conditions) do
+          if c.type == "ErrorOccurred" and c.status == "True" then
+            hs.status = "Degraded"
+            hs.message = c.message or "ApplicationSet error"
+            return hs
+          end
+        end
+      end
+
+      if obj.status.applicationStatus ~= nil and #obj.status.applicationStatus > 0 then
+        local pending = {}
+        for _, app in ipairs(obj.status.applicationStatus) do
+          if app.status ~= "Healthy" then
+            table.insert(pending, app.application .. "=" .. app.status)
+          end
+        end
+        if #pending == 0 then
+          hs.status = "Healthy"
+          hs.message = "All generated Applications are Healthy"
+          return hs
+        end
+        hs.message = "Waiting for: " .. table.concat(pending, ", ")
+        return hs
+      end
+
+      hs.message = "Strategy not set on ApplicationSet; cannot determine child health"
+      return hs
+
+server:
+  service:
+    type: ClusterIP
+
+dex:
+  enabled: false
+
+notifications:
+  enabled: false
+
+applicationSet:
+  enabled: true
+  allowAnyNamespace: true

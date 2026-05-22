@@ -1,6 +1,14 @@
 version: 3
 
 tasks:
+  infra-ready:setup:
+    silent: true
+    vars:
+      GITHUB_TOKEN: gopass show infra-ready/GITHUB_TOKEN
+    cmds:
+      - kubectl create ns infra-ready
+      - kubectl create secret generic github-token -n infra-ready --from-literal=token=${GITHUB_TOKEN}
+
   sync:
     cmds:
       - helmfile sync
@@ -36,6 +44,3 @@ tasks:
       - git commit -m "Update ArgoCD configuration"
       - git push origin main
     desc: "Commit changes to Git"
-
-  start: colima start k8s --kubernetes
-  stop: colima stop k8s

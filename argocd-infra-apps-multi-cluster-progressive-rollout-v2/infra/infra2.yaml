@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: infra2
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - clusters: {}
+  template:
+    metadata:
+      name: "{{ .name }}-infra2"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      annotations:
+        argocd.argoproj.io/sync-wave: "1"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/krzwiatrzyk/showroom.git
+        targetRevision: HEAD
+        path: argocd-infra-apps-multi-cluster-progressive-rollout-v2/charts/app
+        helm:
+          releaseName: "{{ .name }}-infra2"
+      destination:
+        name: "{{ .name }}"
+        namespace: "{{ .name }}-infra2"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

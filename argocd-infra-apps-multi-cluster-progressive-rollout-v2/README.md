@@ -3,10 +3,3 @@
 The goal of this scenario is to prepare a multi-cluster progressive  deployments that satisfy few requirements:
 - for each application first deployment is done on beta then on web clusters
 - for each cluster, first infrastructure apps are deployed and only when they are ready and healthy applications are deployed
-
-Despite this setup works properly, there is a downside to it - all applications must be healthy on beta for any application to be deployed on web.
-Meaning that one single application can break the full progressive deployment for other applications.
-
-Implements:
-
-![alt text](./docs/image.png)

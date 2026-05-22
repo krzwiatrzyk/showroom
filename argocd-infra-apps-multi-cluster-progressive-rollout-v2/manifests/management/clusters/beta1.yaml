@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: beta1
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+    type: beta
+type: Opaque
+stringData:
+  name: beta1
+  server: https://kubernetes.default.svc
+  config: |
+    {
+      "tlsClientConfig": {
+        "insecure": false
+      }
+    }

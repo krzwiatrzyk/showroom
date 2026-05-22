@@ -1,0 +1,18 @@
+# Name of the cluster this job is running on. Used to derive
+# CLUSTER_FILE_PATH = manifests/management/clusters/<clusterName>.yaml
+clusterName: ""
+
+# Reference to an existing Secret in the release namespace that
+# holds the GitHub token used to open the PR.
+githubTokenSecret:
+  name: ""
+  key: ""
+
+image:
+  repository: ttl.sh/windkube-infra-ready
+  tag: "1h"
+  pullPolicy: IfNotPresent
+
+# Job behaviour
+backoffLimit: 3
+ttlSecondsAfterFinished: 600

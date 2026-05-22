@@ -1,0 +1,5 @@
+apiVersion: v2
+name: infra-ready
+version: 0.1.0
+appVersion: "0.1.0"
+description: Job that opens a PR marking the current cluster as infra-ready in the GitOps repo

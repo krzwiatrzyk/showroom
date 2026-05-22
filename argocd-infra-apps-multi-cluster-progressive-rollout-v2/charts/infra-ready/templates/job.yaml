@@ -1,0 +1,34 @@
+{{- if not .Values.clusterName }}{{ fail "clusterName is required" }}{{- end }}
+{{- if not .Values.githubTokenSecret.name }}{{ fail "githubTokenSecret.name is required" }}{{- end }}
+{{- if not .Values.githubTokenSecret.key }}{{ fail "githubTokenSecret.key is required" }}{{- end }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    cluster: {{ .Values.clusterName }}
+spec:
+  backoffLimit: {{ .Values.backoffLimit }}
+  ttlSecondsAfterFinished: {{ .Values.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        cluster: {{ .Values.clusterName }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: infra-ready
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: GITHUB_REPOSITORY
+              value: "krzwiatrzyk/showroom"
+            - name: CLUSTER_FILE_PATH
+              value: "manifests/management/clusters/{{ .Values.clusterName }}.yaml"
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.githubTokenSecret.name }}
+                  key: {{ .Values.githubTokenSecret.key }}
