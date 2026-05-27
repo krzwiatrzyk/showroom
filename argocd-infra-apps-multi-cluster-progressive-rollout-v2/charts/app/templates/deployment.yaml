@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}
+        test: 123
     spec:
       containers:
         - name: echo-server
