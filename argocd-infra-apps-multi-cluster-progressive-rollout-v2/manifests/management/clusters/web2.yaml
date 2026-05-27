@@ -1,18 +1,20 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: web2
-  namespace: argocd
+  creationTimestamp: null
   labels:
     argocd.argoproj.io/secret-type: cluster
     type: web
-type: Opaque
-stringData:
+    windkube.com/infra-ready: "true"
   name: web2
-  server: https://kubernetes.default.svc
+  namespace: argocd
+stringData:
   config: |
     {
       "tlsClientConfig": {
         "insecure": false
       }
     }
+  name: web2
+  server: https://kubernetes.default.svc
+type: Opaque
